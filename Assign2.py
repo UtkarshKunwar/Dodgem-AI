@@ -12,13 +12,13 @@ from framework import Board,Game,Player
 import numpy as np
 import time
 from MyPlayer import MyPlayer
-from OtherPlayer import OtherPlayer
+from OtherPlayer import MyPlayer as OtherPlayer
 np.set_printoptions(suppress=True)
 
 
 if __name__=='__main__':
     board = Board(size=5)
-    player_1 = MyPlayer() # Random player
+    player_1 = OtherPlayer() # Random player
     player_2 = MyPlayer() # MyPlayer
 
     game = Game(board,player_1,player_2)

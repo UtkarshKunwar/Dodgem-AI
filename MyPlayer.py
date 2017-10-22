@@ -1,5 +1,5 @@
 '''
-    File name: 18.py
+    File name: Group18.py
     Author: Utkarsh Kunwar, Utkrisht Dhankar
     Email: utkarsh2602@gmail.com
     Date created: 22 Oct 2017
@@ -34,27 +34,48 @@ class MyPlayer(Player):
                         for right in xrange(col, board.size - 1):
                             if board_matrix[row][right] == 2:
                                 h_value = h_value - 2 / (right - col + 1)
-            return 10 * h_value
+            return h_value
 
         def finish_distance(board):
             h_value = 0
             for piece in board.player_1_pieces:
-                h_value = h_value + (2 / (board.size - piece.pos[1] + 2))
-            for piece in board.player_2_pieces:
-                h_value = h_value - (2 / (piece.pos[0] + 2))
-            return h_value
-
-        def num_pieces(board):
-            h_value = 0
-            for piece in board.player_1_pieces:
                 if piece.dead:
                     h_value = h_value + 1
+                h_value = h_value + (2 / (board.size - piece.pos[1] + 2 ))
             for piece in board.player_2_pieces:
                 if piece.dead:
                     h_value = h_value - 1
+                h_value = h_value - (2 / (piece.pos[0] + 2))
             return h_value
 
-        return lane_blocked(board) + finish_distance(board) + num_pieces(board)
+        def blocks(board):
+            h_value = 0
+            for piece1 in board.player_1_pieces:
+                for piece2 in board.player_2_pieces:
+                    # Direct Block
+                    if (piece1.pos[0] == piece2.pos[0]) and (piece1.pos[1] + 1 == piece2.pos[1]):
+                        if board.turn == 2:
+                            h_value = h_value - 2
+                        else:
+                            h_value = h_value + 2
+
+                    # Diagonal Ahead
+                    if (piece1.pos[0] - 1 == piece2.pos[0]) and (piece1.pos[1] + 1 == piece2.pos[1]):
+                        if board.turn == 2:
+                            h_value = h_value + 2
+                        else:
+                            h_value = h_value - 2
+
+                    # Diagonal Block
+                    if (piece1.pos[0] + 1 == piece2.pos[0]) and (piece1.pos[1] + 1 == piece2.pos[1]):
+                        if board.turn == 2:
+                            h_value = h_value + 5
+                        else:
+                            h_value = h_value - 5
+
+            return h_value
+
+        return lane_blocked(board) + finish_distance(board) + blocks(board)
 
     # Uses the MiniMax Algorithm with AlphaBeta pruning to get the MiniMax value.
     def alphabeta(self, board, alpha=float('-inf'), beta=float('inf'), depth=4):
