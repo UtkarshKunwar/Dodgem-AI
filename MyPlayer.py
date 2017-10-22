@@ -24,7 +24,7 @@ class MyPlayer(Player):
             best_move = ()
             for move in board.get_valid_moves():
                 board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)[1]
+                board_copy = self.try_move(board_copy, move)
                 move_val = self.alphabeta(board_copy)
                 #board.make_move(move)
                 #move_val = self.alphabeta(board)
@@ -39,7 +39,7 @@ class MyPlayer(Player):
             best_move = ()
             for move in board.get_valid_moves():
                 board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)[1]
+                board_copy = self.try_move(board_copy, move)
                 move_val = self.alphabeta(board_copy)
                 #board.make_move(move)
                 #move_val = self.alphabeta(board)
@@ -73,7 +73,7 @@ class MyPlayer(Player):
         if board.turn == 1:
             for move in moves:
                 board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)[1]
+                board_copy = self.try_move(board_copy, move)
                 val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)
                 #board.make_move(move)
                 #val = self.alphabeta(board, alpha=alpha, beta=beta, depth=depth-1)
@@ -87,7 +87,7 @@ class MyPlayer(Player):
         else:
             for move in moves:
                 board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)[1]
+                board_copy = self.try_move(board_copy, move)
                 val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)
                 #board.make_move(move)
                 #val = self.alphabeta(board, alpha=alpha, beta=beta, depth=depth-1)
@@ -102,7 +102,7 @@ class MyPlayer(Player):
     # and return the modified board along it as well.
     def try_move(self, board, move):
         if move not in board.get_valid_moves():
-            return ('lost', board)
+            return board
         if board.turn == 1:
             for piece in board.player_1_pieces:
                 if piece == move[0]:
@@ -112,9 +112,9 @@ class MyPlayer(Player):
                     pieces_left = [item for item in board.player_1_pieces if item.dead == False]
                     if len(pieces_left) == 0:
                         # Opposite Loses
-                        return ('lost', board)
+                        return board
             board.turn = 2
-            return ('continue', board)
+            return board
 
         elif board.turn == 2:
             for piece in board.player_2_pieces:
@@ -125,30 +125,17 @@ class MyPlayer(Player):
                     pieces_left = [item for item in board.player_2_pieces if item.dead == False]
                     if len(pieces_left) == 0:
                         # Opposite Loses
-                        return ('lost', board)
+                        return board
             board.turn = 1
-            return ('continue', board)
+            return board
 
         if len(board.get_valid_moves()) == 0:
             # Other oppoment is blocked by this move
             if board.turn == 1:
                 # Opposite loses
                 board.turn = 2
-                return ('lost', board)
+                return board
             elif board.turn == 2:
                 # Opposite loses
                 board.turn = 1
-                return ('lost', board)
-
-    # To undo the move made
-    def undo_move(self, board, move):
-        undo = list(move)
-        if board.turn == 1:
-            for piece in board.player_1_pieces:
-                if piece == move[0]:
-                    undo[1] = piece.pos
-        if board.turn == 2:
-            for piece in board.player_2_pieces:
-                if piece == move[0]:
-                    undo[1] = piece.pos
-        return undo
+                return board
