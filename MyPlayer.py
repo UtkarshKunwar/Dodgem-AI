@@ -51,8 +51,39 @@ class MyPlayer(Player):
 
     # Returns the evaluation value of the board configuration
     def evaluate(self, board):
-        from random import uniform
-        return uniform(-1000, 1000)
+        def lane_blocked(board):
+            board_matrix = board.get_board_config()[0]
+            h_value = 0
+            for row in xrange(0, board.size):
+                for col in xrange(0, board.size):
+                    if board_matrix[row][col] == 1:
+                        for down in xrange(row, board.size - 1):
+                            if board_matrix[down][col] == 2:
+                                h_value = h_value + 2 / (down - row + 1)
+                        for right in xrange(col, board.size - 1):
+                            if board_matrix[row][right] == 2:
+                                h_value = h_value - 2 / (right - col + 1)
+            return 10 * h_value
+
+        def finish_distance(board):
+            h_value = 0
+            for piece in board.player_1_pieces:
+                h_value = h_value + (2 / (board.size - piece.pos[1] + 2))
+            for piece in board.player_2_pieces:
+                h_value = h_value - (2 / (piece.pos[0] + 2))
+            return h_value
+
+        def num_pieces(board):
+            h_value = 0
+            for piece in board.player_1_pieces:
+                if piece.dead:
+                    h_value = h_value + 1
+            for piece in board.player_2_pieces:
+                if piece.dead:
+                    h_value = h_value - 1
+            return h_value
+
+        return lane_blocked(board) + finish_distance(board) + num_pieces(board)
 
     # Copies board... because paranoia.
     def copy_board(self, board):
