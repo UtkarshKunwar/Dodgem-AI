@@ -18,36 +18,7 @@ class MyPlayer(Player):
         :param board: Board object
         :return: (piece,new_position,BoardLeavingMove)
         '''
-        # Get best move for first player
-        if board.turn == 1:
-            best_val = float('-inf')
-            best_move = ()
-            for move in board.get_valid_moves():
-                board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)
-                move_val = self.alphabeta(board_copy)
-                #board.make_move(move)
-                #move_val = self.alphabeta(board)
-                #board.make_move(self.undo_move(board, move))
-                if move_val > best_val:
-                    best_val = move_val
-                    best_move = move
-            return best_move
-        # Get best move for second player
-        else:
-            best_val = float('inf')
-            best_move = ()
-            for move in board.get_valid_moves():
-                board_copy = self.copy_board(board)
-                board_copy = self.try_move(board_copy, move)
-                move_val = self.alphabeta(board_copy)
-                #board.make_move(move)
-                #move_val = self.alphabeta(board)
-                #board.make_move(self.undo_move(board, move))
-                if move_val < best_val:
-                    best_val = move_val
-                    best_move = move
-            return best_move
+        return self.alphabeta(board)[1]
 
     # Returns the evaluation value of the board configuration
     def evaluate(self, board):
@@ -85,49 +56,47 @@ class MyPlayer(Player):
 
         return lane_blocked(board) + finish_distance(board) + num_pieces(board)
 
-    # Copies board... because paranoia.
-    def copy_board(self, board):
-        board_copy = Board(size=board.size)
-        board_copy.turn = board.turn
-        board_copy.player_1_pieces = copy.deepcopy(board.player_1_pieces)
-        board_copy.player_2_pieces = copy.deepcopy(board.player_2_pieces)
-        return board_copy
-
     # Uses the MiniMax Algorithm with AlphaBeta pruning to get the MiniMax value.
-    def alphabeta(self, board, alpha=float('-inf'), beta=float('inf'), depth=3):
+    def alphabeta(self, board, alpha=float('-inf'), beta=float('inf'), depth=4):
         # Terminal node
         if depth is 0 or not board.get_valid_moves():
-            return self.evaluate(board)
+            return self.evaluate(board), None
 
         moves = board.get_valid_moves()
         # For MAX
         if board.turn == 1:
+            best_val = float('-inf')
+            best_move = ()
             for move in moves:
-                board_copy = self.copy_board(board)
+                board_copy = copy.deepcopy(board)
                 board_copy = self.try_move(board_copy, move)
-                val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)
-                #board.make_move(move)
-                #val = self.alphabeta(board, alpha=alpha, beta=beta, depth=depth-1)
-                #board.make_move(self.undo_move(board, move))
+                val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)[0]
+
                 if val > alpha:
                     alpha = val
+                if val > best_val:
+                    best_val = val
+                    best_move = move
                 if alpha > beta:
                     break
-            return alpha
+            return alpha, best_move
         # For MIN
         else:
+            best_val = float('inf')
+            best_move = ()
             for move in moves:
-                board_copy = self.copy_board(board)
+                board_copy = copy.deepcopy(board)
                 board_copy = self.try_move(board_copy, move)
-                val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)
-                #board.make_move(move)
-                #val = self.alphabeta(board, alpha=alpha, beta=beta, depth=depth-1)
-                #board.make_move(self.undo_move(board, move))
+                val = self.alphabeta(board_copy, alpha=alpha, beta=beta, depth=depth-1)[0]
+
                 if val < beta:
                     beta = val
+                if val < best_val:
+                    best_val = val
+                    best_move = move
                 if alpha > beta:
                     break
-            return beta
+            return beta, best_move
 
     # Just to do the move without the prints in the 'framework/Board.py'
     # and return the modified board along it as well.
@@ -140,10 +109,6 @@ class MyPlayer(Player):
                     piece.pos = move[1]
                     if move[2] == True:
                         piece.dead = True
-                    pieces_left = [item for item in board.player_1_pieces if item.dead == False]
-                    if len(pieces_left) == 0:
-                        # Opposite Loses
-                        return board
             board.turn = 2
             return board
 
@@ -153,10 +118,6 @@ class MyPlayer(Player):
                     piece.pos = move[1]
                     if move[2] == True:
                         piece.dead = True
-                    pieces_left = [item for item in board.player_2_pieces if item.dead == False]
-                    if len(pieces_left) == 0:
-                        # Opposite Loses
-                        return board
             board.turn = 1
             return board
 
