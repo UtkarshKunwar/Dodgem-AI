@@ -1,5 +1,5 @@
 '''
-    File name: Group18.py
+    File name: Group-18.py
     Author: Utkarsh Kunwar, Utkrisht Dhankar
     Email: utkarsh2602@gmail.com
     Date created: 22 Oct 2017

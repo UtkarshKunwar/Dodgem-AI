@@ -11,7 +11,7 @@
 from framework import Board,Game,Player
 import numpy as np
 import time
-from MyPlayer import MyPlayer
+from Group18 import MyPlayer
 from OtherPlayer import MyPlayer as OtherPlayer
 np.set_printoptions(suppress=True)
 
