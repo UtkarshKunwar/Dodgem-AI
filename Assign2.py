@@ -10,8 +10,9 @@
 
 from framework import Board,Game,Player
 import numpy as np
-from MyPlayer import MyPlayer
-from OtherPlayer import OtherPlayer
+import time
+from Group18 import MyPlayer
+from OtherPlayer import MyPlayer as OtherPlayer
 np.set_printoptions(suppress=True)
 
 
@@ -22,8 +23,12 @@ if __name__=='__main__':
 
     game = Game(board,player_1,player_2)
 
+    start = time.time()
     while (game.step()==0):
+        stop = time.time()
         board_matrix,turn = board.get_board_config()
         print(board_matrix)
+        print("Time = ", stop - start)
         print(" ")
+        start = stop
 
